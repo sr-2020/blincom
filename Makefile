@@ -1,7 +1,7 @@
 DOCKER_COMPOSE_VERSION=1.24.0
 NAMESPACE=sr2020
 SERVICE := platform
-IMAGE := $(or ${image},${image},eva-auth)
+IMAGE := $(or ${image},${image},blincom)
 GIT_TAG := $(shell git tag -l --points-at HEAD | cut -d "v" -f 2)
 TAG := :$(or ${tag},${tag},$(or ${GIT_TAG},${GIT_TAG},latest))
 ENV := $(or ${env},${env},local)
@@ -22,9 +22,9 @@ push:
 deploy:
 	{ \
 	sshpass -p $(password) ssh -o StrictHostKeyChecking=no deploy@$(server) "cd /var/services/$(SERVICE) ;\
-	docker-compose pull auth-app ;\
-	docker-compose up -d --no-deps auth-app ;\
-	docker-compose exec -T auth-app php artisan migrate --force" ;\
+	docker-compose pull blincom-app ;\
+	docker-compose up -d --no-deps blincom-app ;\
+	docker-compose exec -T blincom-app php artisan migrate --force" ;\
 	}
 
 deploy-local:
