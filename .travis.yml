@@ -24,10 +24,6 @@ jobs:
       - make test env=production
 
 addons:
-  sonarcloud:
-    organization: gurkalov-github
-    token:
-      secure: "$SONAR_TOKEN"
   ssh_known_hosts:
   - instance.evarun.ru
   apt:
