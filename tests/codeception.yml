@@ -24,7 +24,7 @@ suites:
         modules:
             enabled:
                 - REST:
-                    url: http://blincom.evarun.ru/api/v1
+                    url: http://auth-blin.evarun.ru/api/v1
                     depends: PhpBrowser
 
 paths:
