@@ -6,7 +6,7 @@ suites:
         modules:
             enabled:
                 - REST:
-                    url: http://localhost:5101/api/v1
+                    url: http://localhost:5200/api/v1
                     depends: PhpBrowser
 
     local:
@@ -15,17 +15,8 @@ suites:
       modules:
         enabled:
         - REST:
-            url: http://localhost:5001/api/v1
+            url: http://localhost:5201/api/v1
             depends: PhpBrowser
-
-    stage:
-        actor: ApiTester
-        path: .
-        modules:
-            enabled:
-                - REST:
-                      url: http://94.103.85.103/api/v1
-                      depends: PhpBrowser
 
     production:
         actor: ApiTester

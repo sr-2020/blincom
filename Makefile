@@ -81,4 +81,4 @@ load:
 
 dump:
 	docker-compose exec app php artisan migrate:refresh --seed
-	PGPASSWORD=$(DB_PASSWORD) pg_dump -h localhost -U app -Fp eva-auth > docker/postgres/dump.sql
+	PGPASSWORD=$(DB_PASSWORD) pg_dump -h localhost -U app -Fp blincom > docker/postgres/dump.sql
