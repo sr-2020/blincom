@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.5 (Debian 11.5-1.pgdg90+1)
+-- Dumped from database version 11.5 (Debian 11.5-3.pgdg90+1)
 -- Dumped by pg_dump version 11.5 (Ubuntu 11.5-3.pgdg18.04+1)
 
 SET statement_timeout = 0;
@@ -76,6 +76,19 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO app;
 
 --
+-- Name: users_follow; Type: TABLE; Schema: public; Owner: app
+--
+
+CREATE TABLE public.users_follow (
+    user_id integer NOT NULL,
+    follow_user_id integer NOT NULL,
+    disable boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.users_follow OWNER TO app;
+
+--
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: app
 --
 
@@ -116,7 +129,8 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.migrations (id, migration, batch) FROM stdin;
-3	2018_10_14_000000_create_users_table	1
+6	2018_10_14_000000_create_users_table	1
+7	2019_11_04_072023_create_users_follow_table	1
 \.
 
 
@@ -125,7 +139,23 @@ COPY public.migrations (id, migration, batch) FROM stdin;
 --
 
 COPY public.users (id, admin, status, name, email, password, api_key, options, created_at, updated_at) FROM stdin;
-1	t	gray	Мистер X	admin@evarun.ru	$2y$10$WO2SUJNqSlAEvlBPw26deOmnmB9JX9GXqsUrwzGs3rtoA8DaYU6EK	TkRVem4yTERSQTNQRHFxcmo4SUozNWZp	{"a":true,"b":1,"c":"on"}	2019-10-19 18:54:55	2019-10-19 18:54:55
+1	t	yellow	Мистер X	admin@evarun.ru	$2y$10$ukPfoahWgmNuX5kDamVR7OpW3N6kKNro726IoODUz.CTuYkVYKPC6	TkRVem4yTERSQTNQRHFxcmo4SUozNWZp	{"a":true,"b":1,"c":"on"}	2019-11-04 09:37:42	2019-11-04 09:37:42
+2	f	green	Мистер A	a@evarun.ru	$2y$10$cylIHu918GcYBMS1eFDgxeJq96ZqsNcamzSmMgDVTkBMpocAQORqW	M3GVem4ySWESQTNQRHFxcmo4SUozNWKA	{"a":true,"b":1,"c":"on"}	2019-11-04 09:37:43	2019-11-04 09:37:43
+3	f	maroon	Мистер B	b@evarun.ru	$2y$10$kHt6e40RfQjlFfbLAKPrAu025N/w5bk1JSI8T4dmOyTFuYvaZayZS	M3GVem4ySWESQTNQRHFxcmo4SUozNWKB	{"a":true,"b":1,"c":"on"}	2019-11-04 09:37:43	2019-11-04 09:37:43
+4	f	aqua	Мистер C	c@evarun.ru	$2y$10$MaG/ZSk0CcNuzhzXug7.teR9fEZfvZF./NMV44nAuTvgiOj59Brxi	M3GVem4ySWESQTNQRHFxcmo4SUozNWKC	{"a":true,"b":1,"c":"on"}	2019-11-04 09:37:43	2019-11-04 09:37:43
+\.
+
+
+--
+-- Data for Name: users_follow; Type: TABLE DATA; Schema: public; Owner: app
+--
+
+COPY public.users_follow (user_id, follow_user_id, disable) FROM stdin;
+1	2	f
+1	3	f
+2	1	f
+2	4	f
+3	2	f
 \.
 
 
@@ -133,14 +163,14 @@ COPY public.users (id, admin, status, name, email, password, api_key, options, c
 -- Name: migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.migrations_id_seq', 3, true);
+SELECT pg_catalog.setval('public.migrations_id_seq', 7, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --
@@ -168,6 +198,14 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: users_follow users_follow_pkey; Type: CONSTRAINT; Schema: public; Owner: app
+--
+
+ALTER TABLE ONLY public.users_follow
+    ADD CONSTRAINT users_follow_pkey PRIMARY KEY (user_id, follow_user_id);
+
+
+--
 -- Name: users users_name_unique; Type: CONSTRAINT; Schema: public; Owner: app
 --
 
@@ -181,6 +219,22 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_follow users_follow_follow_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: app
+--
+
+ALTER TABLE ONLY public.users_follow
+    ADD CONSTRAINT users_follow_follow_user_id_foreign FOREIGN KEY (follow_user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users_follow users_follow_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: app
+--
+
+ALTER TABLE ONLY public.users_follow
+    ADD CONSTRAINT users_follow_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

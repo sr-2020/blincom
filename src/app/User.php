@@ -117,4 +117,20 @@ class User extends Model
     {
         $this->api_key = self::generationApiKey();
     }
+
+    /**
+     * The roles that belong to the user.
+     */
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'users_follow', 'follow_user_id', 'user_id');
+    }
+
+    /**
+     * The roles that belong to the user.
+     */
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'users_follow', 'user_id', 'follow_user_id');
+    }
 }

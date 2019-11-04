@@ -21,6 +21,9 @@ $router->group([
 ], function () use ($router) {
     $router->get('profile', 'ProfileController@read');
     $router->put('profile', 'ProfileController@update');
+
+    $router->post('profile/followers/{id}', 'ProfileController@addFollower');
+    $router->delete('profile/followers/{id}', 'ProfileController@deleteFollower');
 });
 
 $router->group([

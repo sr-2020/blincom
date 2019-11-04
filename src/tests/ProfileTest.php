@@ -29,14 +29,16 @@ class ProfileTest extends TestCase
      */
     public function testProfileAuthorizationSuccess()
     {
-        $user = factory(App\User::class)->make();
-        $user->save();
+        $user = App\User::find(1);
+        $data = $user->toArray();
+        $data['following'] = [2, 3];
+        $data['followers'] = [2];
 
         $this->json('GET', '/api/v1/profile', $user->toArray(), [
             'Authorization' => $user->api_key
         ])
             ->seeStatusCode(JsonResponse::HTTP_OK)
-            ->seeJsonEquals($user->toArray());
+            ->seeJsonEquals($data);
     }
 
     /**
@@ -46,14 +48,16 @@ class ProfileTest extends TestCase
      */
     public function testProfileBearerAuthorizationSuccess()
     {
-        $user = factory(App\User::class)->make();
-        $user->save();
+        $user = App\User::find(1);
+        $data = $user->toArray();
+        $data['following'] = [2, 3];
+        $data['followers'] = [2];
 
         $this->json('GET', '/api/v1/profile', $user->toArray(), [
             'Authorization' => 'Bearer ' . $user->api_key
         ])
             ->seeStatusCode(JsonResponse::HTTP_OK)
-            ->seeJsonEquals($user->toArray());
+            ->seeJsonEquals($data);
     }
 
     /**
@@ -63,10 +67,7 @@ class ProfileTest extends TestCase
      */
     public function testProfileAuthorizationFail()
     {
-        $user = factory(App\User::class)->make();
-        $user->save();
-
-        $this->json('GET', '/api/v1/profile', $user->toArray(), [
+        $this->json('GET', '/api/v1/profile', [], [
             'Authorization' => 'Bearer test'
         ])
             ->seeStatusCode(JsonResponse::HTTP_UNAUTHORIZED);
@@ -103,5 +104,98 @@ class ProfileTest extends TestCase
             'Authorization' => 'Bearer test'
         ])
             ->seeStatusCode(JsonResponse::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * A basic test create.
+     *
+     * @return void
+     */
+    public function testAttachUserToVisibleSuccess()
+    {
+        $user = factory(App\User::class)->make();
+        $user->save();
+
+        $followerId = 1;
+        $this->json('POST', '/api/v1/profile/followers/' . $followerId, [], [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJson([]);
+
+        $data = $user->toArray();
+        $data['followers'] = [$followerId];
+        $data['following'] = [];
+        $this->json('GET', '/api/v1/profile', [], [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJsonEquals($data);
+    }
+
+    /**
+     * A basic test create.
+     *
+     * @return void
+     */
+    public function testDetachUserToVisibleSuccess()
+    {
+        $user = App\User::find(2);
+        $data = $user->toArray();
+        $data['followers'] = [1, 3];
+        $data['following'] = [1, 4];
+        $this->json('GET', '/api/v1/profile', [], [
+            'Authorization' => 'Bearer ' . $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJsonEquals($data);
+
+        $this->json('DELETE', '/api/v1/profile/followers/1', $user->toArray(), [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJson([]);
+
+        $data = $user->toArray();
+        $data['followers'] = [3];
+        $data['following'] = [1, 4];
+        $this->json('GET', '/api/v1/profile', [], [
+            'Authorization' => 'Bearer ' . $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJsonEquals($data);
+    }
+
+    /**
+     * A basic test create.
+     *
+     * @return void
+     */
+    public function testAttachExistsUserToVisibleSuccess()
+    {
+        $user = App\User::find(2);
+        $data = $user->toArray();
+        $data['followers'] = [1, 3];
+        $data['following'] = [1, 4];
+        $this->json('GET', '/api/v1/profile', [], [
+            'Authorization' => 'Bearer ' . $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJsonEquals($data);
+
+        $this->json('POST', '/api/v1/profile/followers/1', [], [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJson([]);
+
+        $data = $user->toArray();
+        $data['followers'] = [1, 3];
+        $data['following'] = [1, 4];
+        $this->json('GET', '/api/v1/profile', [], [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJsonEquals($data);
     }
 }

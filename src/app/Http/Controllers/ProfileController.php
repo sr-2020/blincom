@@ -71,8 +71,19 @@ class ProfileController extends Controller
     public function read(Request $request)
     {
         $user = $request->user();
-        $model= User::findOrFail($user->id);
-        return new JsonResponse($model, JsonResponse::HTTP_OK);
+        $model = User::findOrFail($user->id);
+        $data = $model->toArray();
+        $data['followers'] = $model->followers()
+            ->select('id')
+            ->get()
+            ->pluck('id');
+
+        $data['following'] = $model->following()
+            ->select('id')
+            ->get()
+            ->pluck('id');
+
+        return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
 
     /**
@@ -89,5 +100,39 @@ class ProfileController extends Controller
         $model->fill($request->all());
         $model->save();
         return new JsonResponse($model, JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * Add to user visible list.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addFollower(Request $request, int $id)
+    {
+        $user = $request->user();
+
+        $model= User::findOrFail($user->id);
+        $model->followers()->syncWithoutDetaching($id);
+
+        return new JsonResponse([], JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * Delete from user visible list.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteFollower(Request $request, int $id)
+    {
+        $user = $request->user();
+
+        $model= User::findOrFail($user->id);
+        $model->followers()->detach($id);
+
+        return new JsonResponse([], JsonResponse::HTTP_OK);
     }
 }
