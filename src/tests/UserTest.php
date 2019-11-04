@@ -40,7 +40,7 @@ class UserTest extends TestCase
             'Authorization' => 'Token ' . self::getToken()
         ])
             ->seeStatusCode(JsonResponse::HTTP_CREATED)
-            ->seeJson($model->makeHidden('email')->toArray());
+            ->seeJson($model->makeHidden(['email'])->toArray());
     }
 
     /**
@@ -56,5 +56,24 @@ class UserTest extends TestCase
         $this->json('GET', static::ROUTE . '/' . $model->id)
             ->seeStatusCode(JsonResponse::HTTP_OK)
             ->seeJson($model->toArray());
+    }
+
+    /**
+     * A basic test update.
+     *
+     * @return void
+     */
+    public function testUpdate()
+    {
+        $model = $this->makeFactory();
+        $model->save();
+
+        $newModel = $this->makeFactory();
+
+        $this->json('PUT', static::ROUTE . '/' . $model->id, $newModel->toArray(), [
+            'Authorization' => 'Token ' . self::getToken()
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJson($newModel->toArray());
     }
 }

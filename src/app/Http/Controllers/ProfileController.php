@@ -6,6 +6,7 @@ use App\User;
 use App\Item;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * @OA\Get(
@@ -96,8 +97,28 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = $request->user();
+        $user = User::find($user->id);
+
+        $validator = Validator::make($request->all(), [
+            'role' => 'in:budda,runner,patrol',
+        ]);
+
+        if ($validator->fails()) {
+            return new JsonResponse($validator->errors(), JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        if ('budda' === $request->get('role')) {
+            if (!$user->items->contains(3)) {
+                return new JsonResponse([
+                    'role' => ['The selected role is invalid.']
+                ], JsonResponse::HTTP_BAD_REQUEST);
+            }
+        }
 
         $model= User::findOrFail($user->id);
+
+        $fillable = array_diff($model->getFillable(), ['amount']);
+        $model->fillable($fillable);
         $model->fill($request->all());
         $model->save();
         return new JsonResponse($model, JsonResponse::HTTP_OK);

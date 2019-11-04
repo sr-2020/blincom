@@ -58,13 +58,16 @@ class User extends Model
 {
     protected $casts = [
         'admin' => 'boolean',
-        'options' => 'object'
+        'options' => 'object',
+        'amount' => 'float',
     ];
 
     protected $fillable = [
         'admin',
         'name',
         'email',
+        'role',
+        'amount',
         'password',
         'api_key',
         'status',
@@ -76,6 +79,8 @@ class User extends Model
         'admin',
         'name',
         'status',
+        'role',
+        'amount',
         'created_at',
         'updated_at',
         'options',

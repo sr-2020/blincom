@@ -18,8 +18,8 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'email' => $faker->email,
         'password' => $faker->password,
         'status' => $faker->safeColorName,
-        'role' => 'test',
-        'amount' => $faker->numberBetween(100, 1000),
+        'role' => 'runner',
+        'amount' => $faker->randomFloat(1, 100, 1000),
         'options' => (object)['a' => true, 'b' => 1, 'c' => 'on']
     ];
 });

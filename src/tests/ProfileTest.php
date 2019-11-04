@@ -97,6 +97,93 @@ class ProfileTest extends TestCase
      *
      * @return void
      */
+    public function testUpdateProfileRoleSuccess()
+    {
+        $user = factory(App\User::class)->make();
+        $user->role = 'patrol';
+        $user->save();
+
+        $this->json('PUT', '/api/v1/profile', $user->toArray(), [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJson($user->toArray());
+    }
+
+    /**
+     * A basic test create.
+     *
+     * @return void
+     */
+    public function testUpdateProfileWrongRoleFail()
+    {
+        $user = factory(App\User::class)->make();
+        $user->role = 'supermen';
+        $user->save();
+
+        $this->json('PUT', '/api/v1/profile', $user->toArray(), [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_BAD_REQUEST)
+            ->seeJson([
+                "role" => ["The selected role is invalid."]
+            ]);
+    }
+
+    /**
+     * A basic test create.
+     *
+     * @return void
+     */
+    public function testUpdateProfileRoleBuddaSuccess()
+    {
+        $user = factory(App\User::class)->make();
+        $user->role = 'budda';
+        $user->save();
+
+        $this->json('PUT', '/api/v1/profile', $user->toArray(), [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_BAD_REQUEST)
+            ->seeJson([
+                "role" => ["The selected role is invalid."]
+            ]);
+
+        $user->items()->attach(3);
+        $this->json('PUT', '/api/v1/profile', $user->toArray(), [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK)
+            ->seeJson($user->toArray());
+    }
+
+    /**
+     * A basic test create.
+     *
+     * @return void
+     */
+    public function testUpdateProfileAmountNotApplySuccess()
+    {
+        $user = factory(App\User::class)->make();
+        $user->save();
+        $amount = $user->amount;
+        $user->amount = 333.33;
+
+        $this->json('PUT', '/api/v1/profile', $user->toArray(), [
+            'Authorization' => $user->api_key
+        ])
+            ->seeStatusCode(JsonResponse::HTTP_OK);
+
+        $json = json_decode($this->response->content());
+        $this->assertNotEquals($user->amount, $json->amount);
+        $this->assertEquals($amount, $json->amount);
+    }
+
+    /**
+     * A basic test create.
+     *
+     * @return void
+     */
     public function testUpdateProfileAuthorizationFail()
     {
         $user = factory(App\User::class)->make();
@@ -279,6 +366,7 @@ class ProfileTest extends TestCase
         $data['followers'] = [1];
         $data['following'] = [2];
         $data['items'] = [App\Item::find(1)->toArray()];
+        $data['amount'] = 40.0;
         $this->json('GET', '/api/v1/profile', [], [
             'Authorization' => $user->api_key
         ])
