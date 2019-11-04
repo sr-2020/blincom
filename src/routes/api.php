@@ -19,11 +19,16 @@ $router->group([
     'prefix' => 'api/v1',
     'middleware' => ['auth']
 ], function () use ($router) {
+    $router->get('items', 'ItemController@list');
+
     $router->get('profile', 'ProfileController@read');
     $router->put('profile', 'ProfileController@update');
 
     $router->post('profile/followers/{id}', 'ProfileController@addFollower');
     $router->delete('profile/followers/{id}', 'ProfileController@deleteFollower');
+
+    $router->post('profile/items/{id}', 'ProfileController@buyItem');
+    $router->delete('profile/items/{id}', 'ProfileController@deleteItem');
 });
 
 $router->group([

@@ -13,6 +13,7 @@ class UsersSeeder extends Seeder
     {
         $user = factory(App\User::class)->make();
         $user->admin = true;
+        $user->amount = 1000;
         $user->name = 'Мистер X';
         $user->email = 'admin@evarun.ru';
         $user->password = 'secret';
@@ -21,6 +22,7 @@ class UsersSeeder extends Seeder
 
         $user = factory(App\User::class)->make();
         $user->admin = false;
+        $user->amount = 100;
         $user->name = 'Мистер A';
         $user->email = 'a@evarun.ru';
         $user->password = 'secret';
@@ -29,6 +31,7 @@ class UsersSeeder extends Seeder
 
         $user = factory(App\User::class)->make();
         $user->admin = false;
+        $user->amount = 50;
         $user->name = 'Мистер B';
         $user->email = 'b@evarun.ru';
         $user->password = 'secret';
@@ -37,6 +40,7 @@ class UsersSeeder extends Seeder
 
         $user = factory(App\User::class)->make();
         $user->admin = false;
+        $user->amount = 0;
         $user->name = 'Мистер C';
         $user->email = 'c@evarun.ru';
         $user->password = 'secret';

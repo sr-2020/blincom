@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Item;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -71,7 +72,7 @@ class ProfileController extends Controller
     public function read(Request $request)
     {
         $user = $request->user();
-        $model = User::findOrFail($user->id);
+        $model = User::with('items')->findOrFail($user->id);
         $data = $model->toArray();
         $data['followers'] = $model->followers()
             ->select('id')
@@ -132,6 +133,56 @@ class ProfileController extends Controller
 
         $model= User::findOrFail($user->id);
         $model->followers()->detach($id);
+
+        return new JsonResponse([], JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * Buy item.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function buyItem(Request $request, int $id)
+    {
+        $user = $request->user();
+        $item = Item::find($id);
+        if (null === $item) {
+            return new JsonResponse([], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $total = $user->amount - $item->price;
+        if ($total < 0) {
+            return new JsonResponse([
+                'amount' => 'Not enough.'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $user->amount = $total;
+        $user->save();
+
+        $user->items()->attach($id);
+
+        return new JsonResponse([], JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * Drop item.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteItem(Request $request, int $id)
+    {
+        $user = $request->user();
+        $item = Item::find($id);
+        if (null === $item) {
+            return new JsonResponse([], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $user->items()->detach($id);
 
         return new JsonResponse([], JsonResponse::HTTP_OK);
     }

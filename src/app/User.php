@@ -78,7 +78,8 @@ class User extends Model
         'status',
         'created_at',
         'updated_at',
-        'options'
+        'options',
+        'items'
     ];
 
     protected static function boot()
@@ -132,5 +133,13 @@ class User extends Model
     public function following()
     {
         return $this->belongsToMany(User::class, 'users_follow', 'user_id', 'follow_user_id');
+    }
+
+    /**
+     * The roles that belong to the user.
+     */
+    public function items()
+    {
+        return $this->belongsToMany(Item::class, 'users_items');
     }
 }

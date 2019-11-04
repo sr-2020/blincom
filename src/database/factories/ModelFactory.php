@@ -18,6 +18,17 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'email' => $faker->email,
         'password' => $faker->password,
         'status' => $faker->safeColorName,
+        'role' => 'test',
+        'amount' => $faker->numberBetween(100, 1000),
+        'options' => (object)['a' => true, 'b' => 1, 'c' => 'on']
+    ];
+});
+
+$factory->define(App\Item::class, function (Faker\Generator $faker) {
+    return [
+        'activate' => false,
+        'name' => $faker->name,
+        'price' => $faker->numberBetween(10, 100),
         'options' => (object)['a' => true, 'b' => 1, 'c' => 'on']
     ];
 });
