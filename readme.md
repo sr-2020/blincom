@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/sr-2020/blincom.svg?branch=master)](https://travis-ci.org/sr-2020/blincom)
-# Eva Auth Service
+# Blincom Service
 
-Swagger OpenAPI 3 documentaton: http://blincom.evarun.ru/api/documentation
 - [Установка](#setup)
 - [Пользователи](#users)
 	- [Регистрация](#registration)
@@ -223,7 +222,7 @@ curl -X GET "http://blincom.evarun.ru/api/v1/auth/users"
             "b": 1,
             "c": "on"
         },
-        "price": "100"
+        "price": 100
     },
     ...
 ```
