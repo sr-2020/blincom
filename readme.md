@@ -209,7 +209,7 @@ curl -X GET "http://blincom.evarun.ru/api/v1/auth/users"
 
 #### <a name="followers"></a> Управление видимостью местоположения
 Чтобы разрешить пользователю видеть местоположение владельца профиля нужно выполнить POST запрос http://blincom.evarun.ru/api/v1/auth/profile/followers/{userId}, где `{userId}` - идентификатор пользователя.
-После этого в поле `followers` в профиле появится идентификатор пользователя {userId}, у которого в свою очередь в поле `following` появится идентификатор владельца профиля, выполнившего этот запрос.
+После этого в поле `followers` в профиле появится идентификатор пользователя `{userId}`, у которого в свою очередь в поле `following` появится идентификатор владельца профиля, выполнившего этот запрос.
 
 Пример
 ```
@@ -220,7 +220,7 @@ curl -X POST "http://blincom.evarun.ru/api/v1/auth/profile/followers/1" -H "Auth
 
 Пример
 ```
-curl -X DELETE "http://blincom.evarun.ru/api/v1/auth/profile/followers/{userId}" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
+curl -X DELETE "http://blincom.evarun.ru/api/v1/auth/profile/followers/1" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
 ```
 
 ## <a name="items"></a> Магазин имплантов
