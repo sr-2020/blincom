@@ -9,6 +9,10 @@ Swagger OpenAPI 3 documentaton: http://blincom.evarun.ru/api/documentation
 	- [Авторизационный токен](#authtoken)
 	- [Профиль](#profile)
 	- [Список пользователей со статусами](#usersList)
+- [Магазин иплантов](#items)
+	- [Список имплантов](#itemsList)
+	- [Купить имплант](#buyItem)
+	- [Выбросить имплант](#dropItem)
 
 ## <a name="setup"></a> Установка
 Для локальной установки и тестирования нужно выполнить:
@@ -21,7 +25,7 @@ make test
 
 ## <a name="users"></a> Пользователи
 #### <a name="registration"></a> Регистрация
-Регистрация осуществляется через POST запрос на http://blincom.evarun.ru/api/v1/register
+Регистрация осуществляется через POST запрос на http://blincom.evarun.ru/api/v1/auth/register
 
 Тело запроса:
 ```
@@ -41,12 +45,11 @@ make test
 
 Пример:
 ```
-curl -X POST "http://blincom.evarun.ru/api/v1/register" -H "Content-Type: application/json" -d "{\"email\":\"example@example.com\",\"password\":\"hunter2\",\"name\":\"John Doe\"}"
+curl -X POST "http://blincom.evarun.ru/api/v1/auth/register" -H "Content-Type: application/json" -d "{\"email\":\"example@example.com\",\"password\":\"hunter2\",\"name\":\"John Doe\"}"
 ```
 
-
 #### <a name="authorization"></a> Авторизация
-Авторизация осуществляется через POST запрос на http://blincom.evarun.ru/api/v1/login
+Авторизация осуществляется через POST запрос на http://blincom.evarun.ru/api/v1/auth/login
 
 Тело запроса:
 ```
@@ -65,7 +68,7 @@ curl -X POST "http://blincom.evarun.ru/api/v1/register" -H "Content-Type: applic
 
 Пример:
 ```
-curl -X POST "http://blincom.evarun.ru/api/v1/login" -H "Content-Type: application/json" -d "{\"email\":\"example@example.com\",\"password\":\"hunter2\"}"
+curl -X POST "http://blincom.evarun.ru/api/v1/auth/login" -H "Content-Type: application/json" -d "{\"email\":\"example@example.com\",\"password\":\"hunter2\"}"
 ```
 
 #### <a name="authtoken"></a> Авторизационный токен
@@ -82,30 +85,66 @@ curl -X POST "http://blincom.evarun.ru/api/v1/login" -H "Content-Type: applicati
 Все действия для получения общей информации не требуют использования авторизационного токена.
 
 #### <a name="profile"></a> Профиль
-Получение информации о текущем пользователе осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/profile с авторизационным токеном `api_key`.
+Получение информации о текущем пользователе осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/auth/profile с авторизационным токеном `api_key`.
 
 Этот кейс может быть полезен, когда нужно получить информацию только по одному конкретному авторизованному пользователю, вместо того, чтобы грузить весь список пользователей.
 
 Так же данные в этом роуте не кэшируются.
+Поля
+- `items` - список купленных иплантов
+- `followers` - список пользователей, которые могут видеть местоположение владельца профиля
+- `following` - список пользователей, которые разрешили владельцу профиля видеть свое местоположение
+- `role` - роль пользователя
+- `status` - статус пользователя
+- `amount` - баланс пользователя
 
 Тело ответа:
 ```
 {
-  "id": 1,
-  "admin": true,
-  "name": "Api Tim Cook",
-  "status": "free",
-  "created_at": "2019-03-24 21:08:00",
-  "updated_at": "2019-03-24 21:08:30"
+    "id": 1,
+    "admin": true,
+    "amount": 900,
+    "followers": [
+        2
+    ],
+    "following": [
+        2,
+        3
+    ],
+    "items": [
+        {
+            "activate": false,
+            "id": 3,
+            "name": "Budda",
+            "options": {
+                "a": true,
+                "b": 1,
+                "c": "on"
+            },
+            "price": "100"
+        }
+    ],
+    "name": "Мистер X",
+    "options": {
+        "a": true,
+        "b": 1,
+        "c": "on"
+    },
+    "role": "runner",
+    "status": "maroon",
+    "created_at": "2019-11-04 13:06:23",
+    "updated_at": "2019-11-04 18:41:46"
 }
 ```
 
 Пример:
 ```
-curl -X GET "http://blincom.evarun.ru/api/v1/profile" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
+curl -X GET "http://blincom.evarun.ru/api/v1/auth/profile" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
 ```
 
-Редактирование информации о текущем пользователе осуществляется через PUT запрос на http://blincom.evarun.ru/api/v1/profile с авторизационным токеном `api_key`
+Редактирование информации о текущем пользователе осуществляется через PUT запрос на http://blincom.evarun.ru/api/v1/auth/profile с авторизационным токеном `api_key`
+
+Доступные роли: `runner`, `patrol`, `budda` (только при наличии купленного импланта `budda`)
 
 Тело запроса:
 ```
@@ -113,7 +152,8 @@ curl -X GET "http://blincom.evarun.ru/api/v1/profile" -H "Authorization: Bearer 
   "email": "api-test@email.com",
   "password": "secret",
   "name": "Api Tim Cook",
-  "status": "free"
+  "status": "free",
+  "role": "patrol"
 }
 ```
 Тело ответа:
@@ -121,8 +161,10 @@ curl -X GET "http://blincom.evarun.ru/api/v1/profile" -H "Authorization: Bearer 
 {
   "id": 1,
   "admin": true,
+  "amount": 900,
   "name": "Api Tim Cook",
   "status": "free",
+  "role": "patrol",
   "created_at": "2019-03-24 21:08:00",
   "updated_at": "2019-03-24 21:08:30"
 }
@@ -130,12 +172,12 @@ curl -X GET "http://blincom.evarun.ru/api/v1/profile" -H "Authorization: Bearer 
 
 Пример:
 ```
-curl -X PUT "http://blincom.evarun.ru/api/v1/profile" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC" -H "Content-Type: application/json" -d "{\"email\":\"api-test@email.com\",\"password\":\"secret\",\"name\":\"Api Tim Cook\",\"status\":\"free\"}"```
+curl -X PUT "http://blincom.evarun.ru/api/v1/auth/profile" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC" -H "Content-Type: application/json" -d "{\"email\":\"api-test@email.com\",\"password\":\"secret\",\"name\":\"Api Tim Cook\",\"status\":\"free\",\"role\":\"patrol\"}"```
 ```
 
 #### <a name="usersList"></a> Список пользователей со статусами
 
-Получение информации о статусах всех пользователей осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/users
+Получение информации о статусах всех пользователей осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/auth/users
 
 Данные в этом списке кэшируются на 1 секунду методом автоматического прогревания кэша крон-скриптом.
 
@@ -162,5 +204,50 @@ curl -X PUT "http://blincom.evarun.ru/api/v1/profile" -H "Authorization: Bearer 
 
 Пример:
 ```
-curl -X GET "http://blincom.evarun.ru/api/v1/users"
+curl -X GET "http://blincom.evarun.ru/api/v1/auth/users"
+```
+
+## <a name="items"></a> Магазин имплантов
+### <a name="itemsList"></a> Список имплантов
+Просмотреть список всех имплантов, доступные для покупки отображаются с флагом `"allow":true`.
+```
+[
+     ...
+    {
+        "activate": false,
+        "allow": true,
+        "id": 3,
+        "name": "Budda",
+        "options": {
+            "a": true,
+            "b": 1,
+            "c": "on"
+        },
+        "price": "100"
+    },
+    ...
+```
+
+Пример:
+```
+curl -X GET "http://blincom.evarun.ru/api/v1/auth/items" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
+```
+
+### <a name="buyItem"></a> Купить имплант
+Для покупки импланта нужно выполнить пустой POST запрос на следующий роут: http://blincom.evarun.ru/api/v1/auth/profile/items/{itemId},
+где `{itemId}` - идентификатор импланта.
+Для успешной покупки необходима соответствующая сумма в поле профиля `amount`.
+
+Пример
+```
+curl -X POST "http://blincom.evarun.ru/api/v1/auth/profile/items/3" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
+```
+
+### <a name="dropItem"></a> Выбросить имплант
+Для того, чтобы выбросить имплант нужно выполнить пустой DELETE запрос на следующий роут: http://blincom.evarun.ru/api/v1/auth/profile/items/{itemId},
+где `{itemId}` - идентификатор импланта.
+
+Пример
+```
+curl -X DELETE "http://blincom.evarun.ru/api/v1/auth/profile/items/3" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
 ```

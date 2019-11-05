@@ -8,7 +8,8 @@ class Item extends Model
 {
     protected $casts = [
         'activate' => 'boolean',
-        'options' => 'object'
+        'options' => 'object',
+        'price' => 'float',
     ];
 
     protected $fillable = [
