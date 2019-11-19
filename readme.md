@@ -90,7 +90,7 @@ curl -X POST "http://blincom.evarun.ru/api/v1/auth/login" -H "Content-Type: appl
 Все действия для получения общей информации не требуют использования авторизационного токена.
 
 #### <a name="profile"></a> Профиль
-Получение информации о текущем пользователе осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/auth/profile с авторизационным токеном `api_key`.
+Получение информации о текущем пользователе осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/profile с авторизационным токеном `api_key`.
 
 Этот кейс может быть полезен, когда нужно получить информацию только по одному конкретному авторизованному пользователю, вместо того, чтобы грузить весь список пользователей.
 
@@ -102,6 +102,9 @@ curl -X POST "http://blincom.evarun.ru/api/v1/auth/login" -H "Content-Type: appl
 - `role` - роль пользователя
 - `status` - статус пользователя
 - `amount` - баланс пользователя
+- `location_updated_at` - время смены локации пользователем
+- `location_id` - идентификатор локации
+- `location.label` - название локации
 
 Тело ответа:
 ```
@@ -130,10 +133,11 @@ curl -X POST "http://blincom.evarun.ru/api/v1/auth/login" -H "Content-Type: appl
         }
     ],
     "name": "Мистер X",
-    "options": {
-        "a": true,
-        "b": 1,
-        "c": "on"
+    "location_updated_at": "2019-10-02 18:38:15",
+    "location_id": 1,
+    "location": {
+        "id": 1,
+        "label": "Room1"
     },
     "role": "runner",
     "status": "maroon",
@@ -144,7 +148,7 @@ curl -X POST "http://blincom.evarun.ru/api/v1/auth/login" -H "Content-Type: appl
 
 Пример:
 ```
-curl -X GET "http://blincom.evarun.ru/api/v1/auth/profile" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
+curl -X GET "http://blincom.evarun.ru/api/v1/profile" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
 ```
 
 Редактирование информации о текущем пользователе осуществляется через PUT запрос на http://blincom.evarun.ru/api/v1/auth/profile с авторизационным токеном `api_key`
@@ -182,7 +186,7 @@ curl -X PUT "http://blincom.evarun.ru/api/v1/auth/profile" -H "Authorization: Be
 
 #### <a name="usersList"></a> Список пользователей со статусами
 
-Получение информации о статусах всех пользователей осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/auth/users
+Получение информации о статусах всех пользователей осуществляется через GET запрос на http://blincom.evarun.ru/api/v1/users
 
 Данные в этом списке кэшируются на 1 секунду методом автоматического прогревания кэша крон-скриптом.
 
@@ -191,17 +195,26 @@ curl -X PUT "http://blincom.evarun.ru/api/v1/auth/profile" -H "Authorization: Be
  - `status` (статус выбранный пользователем)
  - `created_at` (время когда пользователь зарегистрировался в системе)
  - `updated_at` (время когда пользователь в последний раз обновлял свой профиль)
+ - `location_updated_at` - время смены локации пользователем
+ - `location_id` - идентификатор локации
+ - `location.label` - название локации
 
 Тело ответа:
 ```
 [
     {
-      "id": 1,
-      "admin": true,
-      "name": "Api Tim Cook",
-      "status": "free",
-      "created_at": "2019-03-24 21:08:00",
-      "updated_at": "2019-03-24 21:08:30"
+        "id": 1,
+        "admin": true,
+        "name": "Api Tim Cook",
+        "status": "free",
+        "created_at": "2019-03-24 21:08:00",
+        "updated_at": "2019-03-24 21:08:30",
+        "location_updated_at": "2019-10-02 18:38:15",
+        "location_id": 1,
+        "location": {
+            "id": 1,
+            "label": "Room1"
+        }
     },
     ...
 ]
@@ -209,7 +222,7 @@ curl -X PUT "http://blincom.evarun.ru/api/v1/auth/profile" -H "Authorization: Be
 
 Пример:
 ```
-curl -X GET "http://blincom.evarun.ru/api/v1/auth/users"
+curl -X GET "http://blincom.evarun.ru/api/v1/users"
 ```
 
 #### <a name="followers"></a> Управление видимостью местоположения
