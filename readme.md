@@ -13,6 +13,11 @@
 	- [Список имплантов](#itemsList)
 	- [Купить имплант](#buyItem)
 	- [Выбросить имплант](#dropItem)
+- [Позиционирование](#position)
+	- [Добавить локацию](#addLocation)
+	- [Добавить маячок](#addBeacon)
+	- [Check In местоположения](#checkPosition)
+
 
 ## <a name="setup"></a> Установка
 Для локальной установки и тестирования нужно выполнить:
@@ -266,4 +271,96 @@ curl -X POST "http://blincom.evarun.ru/api/v1/auth/profile/items/3" -H "Authoriz
 Пример
 ```
 curl -X DELETE "http://blincom.evarun.ru/api/v1/auth/profile/items/3" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC"
+```
+
+## <a name="position"></a> Позиционирование
+### <a name="addLocation"></a> Добавить локацию
+Добавление локации осуществляется через POST запрос на http://blincom.evarun.ru/api/v1/position/locations
+Использовать админский токен: `TkRVem4yTERSQTNQRHFxcmo4SUozNWZp`
+
+Тело запроса:
+```
+{
+  "label": "room1",
+}
+```
+Тело ответа:
+```
+{
+  "id": 3003,
+  "label": "room1",
+}
+```
+
+Пример:
+```
+curl -X POST "http://blincom.evarun.ru/api/v1/position/locations" -H "Authorization: Bearer TkRVem4yTERSQTNQRHFxcmo4SUozNWZp" -H "Content-Type: application/json" -d "{\"label\":\"room1\"}"
+```
+
+
+### <a name="addBeacon"></a> Добавить маячок
+Добавление маячка осуществляется через POST запрос на http://blincom.evarun.ru/api/v1/position/beacons
+Использовать админский токен: `TkRVem4yTERSQTNQRHFxcmo4SUozNWZp`
+
+Тело запроса:
+```
+{
+  "label": "beacon1",
+  "ssid": "beacon1",
+  "bssid": "c0:0a:95:9d:cd:0c",
+  "location_id": 3003
+}
+```
+Тело ответа:
+```
+{
+  "id":3009,
+  "bssid":"C0:0A:95:9D:CD:0C",
+  "label":"beacon1",
+  "location_id":3003,
+  "ssid":"beacon1"
+}
+```
+
+Пример:
+```
+curl -X POST "http://blincom.evarun.ru/api/v1/position/beacons" -H "Authorization: Bearer TkRVem4yTERSQTNQRHFxcmo4SUozNWZp" -H "Content-Type: application/json" -d {\"label\":\"room1\",\"ssid\":\"beacon1\",\"bssid\":\"c0:0a:95:9d:00:0c\"}"
+```
+
+### <a name="checkPosition"></a> Check In местоположения
+Check In местоположения осуществляется через POST запрос на http://blincom.evarun.ru/api/v1/position/positions
+Использовать пользовательский токен.
+
+Нужно передавать список всех видимых BLE-маячков с соответствующими полями. Пользователь зачекинится у маячка, `level` уровень слышимости которого будет максимальным, после чего пользователь привяжется к локации маячка.
+
+Тело запроса:
+```
+{
+  "beacons": [
+    {
+      "ssid": "beacon1",
+      "bssid": "b0:0a:95:9d:00:0a",
+      "level": -70
+    },
+    {
+      "ssid": "beacon3003",
+      "bssid": "c0:0a:95:9d:cd:0c",
+      "level": -50
+    }
+  ]
+}
+```
+Тело ответа:
+```
+{
+ "id": 180619,
+ "user_id": 1,
+ "location_id": 3003,
+ "created_at": "2019-11-19 05:36:27"
+}
+```
+
+Пример:
+```
+curl -X POST "http://blincom.evarun.ru/api/v1/position/positions" -H "Authorization: Bearer MmVDDllSdUpKa0h5MFBDdjN1QnlVbEVC" -H "Content-Type: application/json" -d "{\"beacons\":[{\"ssid\":\"beacon1\",\"bssid\":\"b0:0a:95:9d:00:0a\",\"level\":-70},{\"ssid\":\"beacon1\",\"bssid\":\"c0:0a:95:9d:cd:0c\",\"level\":-50}]}"
 ```
